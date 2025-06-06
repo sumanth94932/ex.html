@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Application Form with Firebase Realtime Database</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f8;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      padding: 25px 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #555;
+    }
+    input, select, textarea {
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+    button:hover:enabled {
+      background-color: #0056b3;
+    }
+    .success-message {
+      color: #28a745;
+      font-weight: bold;
+      margin-top: 15px;
+      text-align: center;
+    }
+    .error-message {
+      color: #dc3545;
+      font-weight: bold;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Application Form</h2>
+    <form id="appForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="4"></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+    <div id="successMessage" class="success-message" style="display:none;">Form submitted successfully!</div>
+    <div id="errorMessage" class="error-message" style="display:none;">Error submitting form. Please try again.</div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+  apiKey: "AIzaSyAQFFLkp_0LkpRuwHUU_liVlaY71cp_N38",
+  authDomain: "web-development-2e235.firebaseapp.com",
+  databaseURL: "https://web-development-2e235-default-rtdb.firebaseio.com",
+  projectId: "web-development-2e235",
+  storageBucket: "web-development-2e235.firebasestorage.app",
+  messagingSenderId: "595905220994",
+  appId: "1:595905220994:web:12976b7370f49e79b0ff9b",
+  measurementId: "G-YJ4Z3MJXLZ"
+};
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const form = document.getElementById('appForm');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      successMessage.style.display = 'none';
+      errorMessage.style.display = 'none';
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      submitButton.disabled = true;
+
+      const formData = {
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        message: form.message.value.trim(),
+        submittedAt: new Date().toISOString()
+      };
+
+      const newFormKey = database.ref().child('applications').push().key;
+      const updates = {};
+      updates['/applications/' + newFormKey] = formData;
+
+      database.ref().update(updates)
+        .then(() => {
+          successMessage.style.display = 'block';
+          form.reset();
+        })
+        .catch((error) => {
+          console.error('Error submitting form:', error);
+          errorMessage.style.display = 'block';
+        })
+        .finally(() => {
+          submitButton.disabled = false;
+        });
+    });
+  </script>
+</body>
+</html>
