@@ -3,127 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Doctor Appointment Form</title>
+  <title>Application Form with Firebase Realtime Database</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #4caf50, #087f23);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f8;
       margin: 0;
       padding: 20px;
+      display: flex;
+      justify-content: center;
     }
     .container {
-      background: white;
-      max-width: 480px;
+      background: #fff;
+      padding: 25px 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 600px;
       width: 100%;
-      padding: 30px 40px;
-      border-radius: 12px;
-      box-shadow: 0 16px 24px rgba(0,0,0,0.25);
     }
-    h1 {
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
       text-align: center;
-      margin-bottom: 24px;
-      color: #0d4d00;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
     }
     label {
-      display: block;
-      font-weight: 600;
-      margin: 12px 0 6px;
-      color: #155724;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #555;
     }
     input, select, textarea {
-      width: 100%;
-      padding: 12px;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
       font-size: 1rem;
-      border-radius: 8px;
-      border: 1.8px solid #c3e6cb;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: #28a745;
-      outline: none;
-      background: #e6f4ea;
-    }
-    textarea {
-      min-height: 100px;
       resize: vertical;
     }
     button {
-      margin-top: 24px;
-      width: 100%;
-      padding: 14px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      background-color: #28a745;
+      background-color: #007BFF;
       color: white;
+      padding: 12px;
       border: none;
-      border-radius: 8px;
+      border-radius: 4px;
+      font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover:not(:disabled) {
-      background-color: #1e7e34;
     }
     button:disabled {
-      background-color: #94d3a2;
+      background-color: #6c757d;
       cursor: not-allowed;
     }
-    .message {
-      margin-top: 18px;
-      font-weight: 700;
+    button:hover:enabled {
+      background-color: #0056b3;
+    }
+    .success-message {
+      color: #28a745;
+      font-weight: bold;
+      margin-top: 15px;
       text-align: center;
     }
-    .message.error {
+    .error-message {
       color: #dc3545;
-    }
-    .message.success {
-      color: #28a745;
+      font-weight: bold;
+      margin-top: 15px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Doctor Appointment Form</h1>
-    <form id="appointmentForm" autocomplete="off">
-      <label for="patientName">Patient Name *</label>
-      <input type="text" id="patientName" name="patientName" placeholder="Full name" required />
+    <h2>Application Form</h2>
+    <form id="appForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required />
 
-      <label for="email">Email *</label>
-      <input type="email" id="email" name="email" placeholder="email@example.com" required />
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
 
-      <label for="phone">Phone Number *</label>
-      <input type="tel" id="phone" name="phone" placeholder="+1 555 123 4567" required />
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="4"></textarea>
 
-      <label for="appointmentDate">Appointment Date *</label>
-      <input type="date" id="appointmentDate" name="appointmentDate" required min="" />
-
-      <label for="doctor">Select Doctor *</label>
-      <select id="doctor" name="doctor" required>
-        <option value="" disabled selected>Select a doctor</option>
-        <option value="Dr. Smith">Dr. Smith</option>
-        <option value="Dr. Johnson">Dr. Johnson</option>
-        <option value="Dr. Lee">Dr. Lee</option>
-        <option value="Dr. Patel">Dr. Patel</option>
-      </select>
-
-      <label for="message">Additional Message</label>
-      <textarea id="message" name="message" placeholder="Your message (optional)"></textarea>
-
-      <button type="submit">Book Appointment</button>
-      <div id="formMessage" class="message" aria-live="polite"></div>
+      <button type="submit">Submit</button>
     </form>
+    <div id="successMessage" class="success-message" style="display:none;">Form submitted successfully!</div>
+    <div id="errorMessage" class="error-message" style="display:none;">Error submitting form. Please try again.</div>
   </div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
   <script>
-    // Replace with your Firebase config details
+    // Your Firebase configuration
     const firebaseConfig = {
   apiKey: "AIzaSyAQFFLkp_0LkpRuwHUU_liVlaY71cp_N38",
   authDomain: "web-development-2e235.firebaseapp.com",
@@ -131,68 +104,53 @@
   projectId: "web-development-2e235",
   storageBucket: "web-development-2e235.firebasestorage.app",
   messagingSenderId: "595905220994",
-  appId: "1:595905220994:web:101e0cc247d3cbdcb0ff9b",
-  measurementId: "G-4HER36YW61"
+  appId: "1:595905220994:web:12976b7370f49e79b0ff9b",
+  measurementId: "G-YJ4Z3MJXLZ"
 };
 
     // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Set the minimum date to today for appointment date input
-    const appointmentDateInput = document.getElementById('appointmentDate');
-    const today = new Date().toISOString().split('T')[0];
-    appointmentDateInput.min = today;
+    const form = document.getElementById('appForm');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitButton = form.querySelector('button[type="submit"]');
 
-    const form = document.getElementById('appointmentForm');
-    const formMessage = document.getElementById('formMessage');
-    const submitBtn = form.querySelector('button[type="submit"]');
-
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
-      formMessage.textContent = '';
-      formMessage.className = 'message';
-      submitBtn.disabled = true;
+      successMessage.style.display = 'none';
+      errorMessage.style.display = 'none';
 
-      const appointmentData = {
-        patientName: form.patientName.value.trim(),
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      submitButton.disabled = true;
+
+      const formData = {
+        name: form.name.value.trim(),
         email: form.email.value.trim(),
-        phone: form.phone.value.trim(),
-        appointmentDate: form.appointmentDate.value,
-        doctor: form.doctor.value,
         message: form.message.value.trim(),
         submittedAt: new Date().toISOString()
       };
 
-      // Basic validation
-      if (
-        !appointmentData.patientName ||
-        !appointmentData.email ||
-        !appointmentData.phone ||
-        !appointmentData.appointmentDate ||
-        !appointmentData.doctor
-      ) {
-        formMessage.textContent = 'Please fill in all required fields.';
-        formMessage.classList.add('error');
-        submitBtn.disabled = false;
-        return;
-      }
+      const newFormKey = database.ref().child('applications').push().key;
+      const updates = {};
+      updates['/applications/' + newFormKey] = formData;
 
-      const appointmentsRef = database.ref('doctorAppointments');
-      appointmentsRef.push(appointmentData)
+      database.ref().update(updates)
         .then(() => {
-          formMessage.textContent = 'Appointment booked successfully!';
-          formMessage.classList.add('success');
+          successMessage.style.display = 'block';
           form.reset();
-          // Reset min date for appointment input
-          appointmentDateInput.min = today;
         })
         .catch((error) => {
-          formMessage.textContent = 'Error booking appointment: ' + error.message;
-          formMessage.classList.add('error');
+          console.error('Error submitting form:', error);
+          errorMessage.style.display = 'block';
         })
         .finally(() => {
-          submitBtn.disabled = false;
+          submitButton.disabled = false;
         });
     });
   </script>

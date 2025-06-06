@@ -1,182 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Course Application Form</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #4a90e2, #357ABD);
-    min-height: 100vh;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-  .container {
-    background: white;
-    padding: 30px 40px;
-    max-width: 450px;
-    border-radius: 10px;
-    box-shadow: 0 18px 30px rgba(0,0,0,0.2);
-    width: 100%;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 24px;
-    color: #222;
-  }
-  label {
-    display: block;
-    margin: 15px 0 8px;
-    font-weight: 600;
-    color: #333;
-  }
-  input, select, textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    border-radius: 7px;
-    border: 1.8px solid #ccc;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: #357ABD;
-    outline: none;
-    background: #f0f7ff;
-  }
-  textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  button {
-    margin-top: 25px;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    background-color: #357ABD;
-    color: white;
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button:hover:not(:disabled) {
-    background-color: #2a5d94;
-  }
-  button:disabled {
-    cursor: not-allowed;
-    background-color: #a1bace;
-  }
-  .message {
-    margin-top: 20px;
-    font-weight: 700;
-    text-align: center;
-  }
-  .message.error {
-    color: #D9534F;
-  }
-  .message.success {
-    color: #5CB85C;
-  }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simple Student Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+        #message {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+    <!-- Firebase App (core) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <!-- Firebase Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script>
+        // Replace with your Firebase project credentials
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQFFLkp_0LkpRuwHUU_liVlaY71cp_N38",
+            authDomain: "web-development-2e235.firebaseapp.com",
+            projectId: "web-development-2e235",
+            storageBucket: "web-development-2e235.appspot.com",
+            messagingSenderId: "595905220994",
+            appId: "1:595905220994:web:47b5581529a12153b0ff9b",
+            measurementId: "G-B4V5QLMVFR"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+    </script>
 </head>
 <body>
-  <div class="container">
-    <h1>Course Application Form</h1>
-    <form id="courseApplicationForm" autocomplete="off">
-      <label for="fullName">Full Name *</label>
-      <input type="text" id="fullName" name="fullName" placeholder="Your full name" required />
-      
-      <label for="email">Email *</label>
-      <input type="email" id="email" name="email" placeholder="example@example.com" required />
-      
-      <label for="phone">Phone Number *</label>
-      <input type="tel" id="phone" name="phone" placeholder="+1 555 123 4567" required />
-      
-      <label for="course">Select Course *</label>
-      <select id="course" name="course" required>
-        <option value="" disabled selected>Select a course</option>
-        <option value="Web Development">Web Development</option>
-        <option value="Data Science">Data Science</option>
-        <option value="Mobile App Development">Mobile App Development</option>
-        <option value="UI/UX Design">UI/UX Design</option>
-      </select>
-      
-      <label for="message">Additional Message</label>
-      <textarea id="message" name="message" placeholder="Your message (optional)"></textarea>
-      
-      <button type="submit">Apply Now</button>
-      <div id="formMessage" class="message" aria-live="polite"></div>
-    </form>
-  </div>
+    <div class="container">
+        <h2>Student Form</h2>
+        <form id="studentForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required />
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  
-  <script>
-    // Replace with your Firebase config
-   const firebaseConfig = {
-  apiKey: "AIzaSyAQFFLkp_0LkpRuwHUU_liVlaY71cp_N38",
-  authDomain: "web-development-2e235.firebaseapp.com",
-  databaseURL: "https://web-development-2e235-default-rtdb.firebaseio.com",
-  projectId: "web-development-2e235",
-  storageBucket: "web-development-2e235.firebasestorage.app",
-  messagingSenderId: "595905220994",
-  appId: "1:595905220994:web:37ee99197ed208e8b0ff9b",
-  measurementId: "G-7PN0DQ338B"
-};
+            <label for="rollNumber">Roll Number:</label>
+            <input type="text" id="rollNumber" name="rollNumber" required />
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
 
-    const form = document.getElementById('courseApplicationForm');
-    const formMessage = document.getElementById('formMessage');
-    const submitBtn = form.querySelector('button[type="submit"]');
+            <button type="submit">Submit</button>
+        </form>
+        <div id="message"></div>
+    </div>
+    <script>
+        const form = document.getElementById('studentForm');
+        const messageDiv = document.getElementById('message');
+        const submitButton = form.querySelector('button[type="submit"]');
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      formMessage.textContent = '';
-      formMessage.className = 'message';
-      submitBtn.disabled = true;
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            messageDiv.style.color = 'black';
+            messageDiv.textContent = "Submitting...";
+            submitButton.disabled = true;
 
-      const applicationData = {
-        fullName: form.fullName.value.trim(),
-        email: form.email.value.trim(),
-        phone: form.phone.value.trim(),
-        course: form.course.value,
-        message: form.message.value.trim(),
-        submittedAt: new Date().toISOString()
-      };
+            const name = this.name.value.trim();
+            const rollNumber = this.rollNumber.value.trim();
+            const email = this.email.value.trim();
 
-      if (!applicationData.fullName || !applicationData.email || !applicationData.phone || !applicationData.course) {
-        formMessage.textContent = 'Please fill in all required fields.';
-        formMessage.classList.add('error');
-        submitBtn.disabled = false;
-        return;
-      }
+            const newKey = database.ref().child('students').push().key;
+            const updates = {};
+            updates['/students/' + newKey] = { name, rollNumber, email, submittedAt: new Date().toISOString() };
 
-      const applicationsRef = database.ref('courseApplications');
-      applicationsRef.push(applicationData)
-        .then(() => {
-          formMessage.textContent = 'Your application was submitted successfully!';
-          formMessage.classList.add('success');
-          form.reset();
-        })
-        .catch((error) => {
-          formMessage.textContent = 'Error submitting application: ' + error.message;
-          formMessage.classList.add('error');
-        })
-        .finally(() => {
-          submitBtn.disabled = false;
+            database.ref().update(updates)
+                .then(() => {
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = "Form submitted successfully!";
+                    form.reset();
+                })
+                .catch((error) => {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = "Submission failed. Please try again.";
+                    console.error(error);
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                });
         });
-    });
-  </script>
+    </script>
 </body>
 </html>
